@@ -4,21 +4,11 @@ import { Config } from "../../constant/Index";
 export const DZapi = createApi({
   reducerPath: "DZapi",
   baseQuery: fetchBaseQuery({
-    // baseUrl: process.env.REACT_APP_SERVER_URL,
     baseUrl: Config.serverUrl,
-   
     prepareHeaders: async (headers, { getState, endpoint }) => {
-      // if (
-      //   localStorage.getItem(Config.userToken) &&
-      //   endpoint !== "refresh"
-      // )
-        // headers.set(
-        //   "Authorization",
-        //   `Bearer ${localStorage.getItem(Config?.userToken)}`
-        // );
       headers.set("Accept", "application/json");
       // headers.set("Accept", "text/plain");
-      // headers.set('Content-Type', 'application/json');
+      headers.set('Content-Type', 'application/json');
 
       return headers;
     },
@@ -49,6 +39,38 @@ export const DZapi = createApi({
         url: `Homes/${id}`,
         method: "DELETE",
       }),
+    }),
+    roomAdd: builder.mutation({
+      query: (pro) => ({
+        url:  `roomProfiles/add/${pro.userId}`,
+        method: "POST",
+        body: pro.data,
+      })
+    }),
+    roomUpdate: builder.mutation({
+      query: (body) => ({
+        url:  `roomProfiles/modify`,
+        method: "PUT",
+        body: body,
+      }),
+    }),
+    removeRoom: builder.mutation({
+      query: (id) => ({
+        url: `roomProfiles/remove/${id}`,
+        method: "DELETE",
+      }),
+    }),
+    login: builder.mutation({
+      query: (body) => ({
+        url: `users/login?email=${body.email}&password=${body.password}`,
+      }),
+    }),
+    signup: builder.mutation({
+      query: (body) => ({
+        url: `users/signup`,
+        method: "POST",
+        body: body,
+      }),
     })
   }),
 });
@@ -57,5 +79,10 @@ export const {
   useGetAllUserHomesQuery,
   useAddHomeMutation,
   useUpdateHomeMutation,
-  useDeleteHomeMutation
+  useDeleteHomeMutation,
+  useRoomAddMutation,
+  useRoomUpdateMutation,
+  useRemoveRoomMutation,
+  useLoginMutation,
+  useSignupMutation
 } = DZapi;
