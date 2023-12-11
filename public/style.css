@@ -90,12 +90,15 @@ html,
     align-items: center;
     justify-content: space-between;
 
+    gap: 10px;
 
     .btn {
+        cursor: pointer;
         width: fit-content;
         display: flex;
         align-items: center;
         gap: 10px;
+        width: 100%;
 
         font-weight: 400;
 
@@ -194,6 +197,20 @@ html,
 
 
 /* Popup */
+.form__container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    
+    gap: 24px;
+}
+
+.form{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
 
 .edit__popup {
     position: fixed;
@@ -202,9 +219,9 @@ html,
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    
+    display: flex;
+    flex-direction: column;
     gap: 16px;
 
     z-index: 2;

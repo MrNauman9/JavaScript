@@ -1,6 +1,10 @@
 import React from "react";
-
-function HouseDetailCard() {
+import { useDeleteHomeMutation } from "../../redux/services/DZapi";
+function HouseDetailCard({ data,  }) {
+  const [deleteHome] = useDeleteHomeMutation();
+  const houseDelete = () => {
+    deleteHome(data?.id);
+  };
   return (
     <div className="house__detail">
       <div className="header__container">
@@ -12,29 +16,28 @@ function HouseDetailCard() {
           </span>
           <span className="detail__list">
             Device Name
-            <span>XYZ</span>
+            <span>{data?.deviceName || "Xyz"}</span>
           </span>
           <span className="detail__list">
-            House Name
-            <span>AVCE</span>
+            House Address
+            <span>{data?.houseName || "Street 983"}</span>
           </span>
           <span className="detail__list">
             Number of Rooms
-            <span>24</span>
+            <span>{data?.numberOfRooms || "10"}</span>
           </span>
           <span className="detail__list">
             Address
-            <span>24 Street</span>
+            <span>{data?.address || "24 Street"}</span>
           </span>
         </div>
       </div>
-
-      <div className="btns">
-            <a href="#" className="btn">
-                Delete
-            </a>
-            <i className="ri-delete-bin-7-fill"></i>
+      <div className="btns"  >
+        <div className="btn" style={{display: "flex", gap: "10px"}} onClick={houseDelete}>
+          Delete
+        <i className="ri-delete-bin-7-fill"></i>
         </div>
+      </div>
     </div>
   );
 }

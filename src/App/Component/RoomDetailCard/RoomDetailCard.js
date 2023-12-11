@@ -1,10 +1,10 @@
 import React from "react";
 
-function RoomDetailCard() {
+function RoomDetailCard({key, data}) {
   return (
-    <div className="room__card">
+    <div className="room__card" key={key}>
       <div className="card__img">
-        <img src="images/temprautre.png" alt="Temperature Image" />
+        <img src="images/temprautre.png" alt="Temperature Image"/>
         <span className="room__text">Room Temperature</span>
       </div>
       <span className="room__text">
@@ -19,7 +19,6 @@ function RoomDetailCard() {
         Default Temperature
         <span>28 Degree</span>
       </span>
-
       <i className="ri-edit-box-fill delete__icon"></i>
     </div>
   );

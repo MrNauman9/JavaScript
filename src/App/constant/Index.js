@@ -1,3 +1,3 @@
 export const Config = {
-  serverUrl: "/",
+  serverUrl: "http://20.79.215.223:8080/",
 };

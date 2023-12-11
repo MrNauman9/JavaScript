@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import "./RoomDetail.css";
 import RoomDetailCard from "../../Component/RoomDetailCard/RoomDetailCard";
 
 function RoomDetail() {
+  const [houseDetail, setHouseDetail] = useState([]);
   return (
     <div id="mainRoomDetail">
       <div className="house__detail">
@@ -15,19 +16,19 @@ function RoomDetail() {
             </span>
             <span className="detail__list">
               Device Name
-              <span>XYZ</span>
+              <span>{houseDetail?.deviceName && "Xyz"}</span>
             </span>
             <span className="detail__list">
               House Name
-              <span>AVCE</span>
+              <span>{houseDetail?.houseName && "House Name"}</span>
             </span>
             <span className="detail__list">
               Number of Rooms
-              <span>24</span>
+              <span>{houseDetail?.numberOfRooms && "10"}</span>
             </span>
             <span className="detail__list">
               Address
-              <span>24 Street</span>
+              <span>{houseDetail?.address && "24 Street"}</span>
             </span>
           </div>
         </div>
@@ -53,7 +54,9 @@ function RoomDetail() {
           </a>
         </div>
         <div className="cards__container">
-          <RoomDetailCard />
+          {houseDetail?.map((item) => {
+            <RoomDetailCard key={item.id} data={item} />;
+          })}
         </div>
       </div>
     </div>

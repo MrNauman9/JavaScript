@@ -20,24 +20,24 @@ function HomePopup({ popup, setPopup, homeId, setHomeId, userId }) {
     setPopup(false);
     setHomeId(null);
   };
-  console.log(userId)
+  console.log(userId);
   const handleSubmit = (e) => {
     e.preventDefault();
     const updateData = {
-      data : {
+      data: {
         homeId: homeId,
-      address: data.address,
-      deviceEui: data.deviceEui,
-      },
-      userId: userId
-    };
-    const addData = {
-      data : {
         address: data.address,
         deviceEui: data.deviceEui,
       },
-      userId: userId
-    }
+      userId: userId,
+    };
+    const addData = {
+      data: {
+        address: data.address,
+        deviceEui: data.deviceEui,
+      },
+      userId: userId,
+    };
     if (homeId) {
       updateHome(updateData);
       closePopup();
@@ -76,11 +76,13 @@ function HomePopup({ popup, setPopup, homeId, setHomeId, userId }) {
             />
           </div>
 
-          <div className="btn" onClick={handleSubmit}>
-            Submit
-          </div>
-          <div className="btn" onClick={() => closePopup()}>
-            Cancel
+          <div className="seperator">
+            <div className="btn" onClick={handleSubmit}>
+              Submit
+            </div>
+            <div className="btn" onClick={() => closePopup()}>
+              Cancel
+            </div>
           </div>
         </form>
       )}
