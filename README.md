@@ -30,7 +30,7 @@ Alternatively, you can run the project directly without Docker by using npm:
 
 npm start
 
-This command will launch the application, and you can access it in your web browser at http://localhost:3000
+This command will launch the application, and can be access  in your web browser at http://localhost:3000
 
 # Key Features of the Project:
 
