@@ -1,28 +1,29 @@
-# building
+# Use the official Node.js image as a base image
+FROM node:14 as build
 
-FROM node:19-alpine3.15 AS builder
-ENV NODE_ENV production
-# Add a work directory
+# Set the working directory
 WORKDIR /app
-# Cache and Install dependencies
-COPY package.json .
-COPY package-lock.json .
-RUN npm install --production
-# Copy app files
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application code
 COPY . .
-# Build the app
+
+# Build the React application
 RUN npm run build
 
-# hosting
+# Use the official Nginx image to serve the React application
+FROM nginx:alpine
 
-# Bundle static assets with nginx
-FROM nginx:1.23-alpine as production
-ENV NODE_ENV production
-# Copy built assets from builder
-COPY --from=builder /app/build /usr/share/nginx/html
-# Add your nginx.conf
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-# Expose port
+# Copy the build output to the Nginx HTML directory
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Expose port 80
 EXPOSE 80
-# Start nginx
+
+# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
