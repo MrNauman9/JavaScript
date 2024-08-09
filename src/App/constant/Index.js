@@ -1,3 +1,3 @@
 export const Config = {
-  serverUrl: "http://20.79.215.223:8080/",
+  serverUrl: "https://66acd96bf009b9d5c7339b21.mockapi.io/smart_home/",
 };
