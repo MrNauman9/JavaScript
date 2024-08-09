@@ -1,0 +1,84 @@
+name: CI for React Application
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' 
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm install --save-dev @babel/plugin-proposal-private-property-in-object
+
+      - name: Update browserslist database
+        run: npx update-browserslist-db@latest
+
+      - name: Build the React app
+        run: |
+          CI=false npm run build
+
+      - name: List build directory for debugging
+        run: ls -R build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: build
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify initial directory contents
+        run: ls -R
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./build
+
+      - name: List build directory for debugging
+        run: ls -R ./build
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/my-react-app:latest
+
+      - name: Deploy to Docker Hub
+        run: |
+          docker pull ${{ secrets.DOCKER_USERNAME }}/my-react-app:latest
+          docker run -d -p 80:80 ${{ secrets.DOCKER_USERNAME }}/my-react-app:latest
