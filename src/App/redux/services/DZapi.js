@@ -18,11 +18,11 @@ export const DZapi = createApi({
 
   endpoints: (builder) => ({
     getAllUserHomes: builder.query({
-      query: (id) => `Homes/${id}`,
+      query: (id) => `Homes`,
     }),
     addHome: builder.mutation({
       query: (pro) => ({
-        url:  `Homes/${pro.userId}`,
+        url:  `Homes/`,
         method: "POST",
         body: pro.data,
       })
