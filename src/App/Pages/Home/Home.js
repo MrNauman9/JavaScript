@@ -1,61 +1,77 @@
-import React, { useEffect, useId, useState } from "react";
+import React, { useState } from "react";
 import "./home.css";
 import HomeCard from "../../Component/HomeCard/HomeCard";
-import { useGetAllUserHomesQuery } from "../../redux/services/DZapi";
 import HomePopup from "../../Component/HomePopup/HomePopup";
+import { useHandleHomesApi } from "../../hooks/useHandleHomesApi";
 
 function Home() {
-  const [popup, setPopup] = useState(false)
-  const [userId, setUserId] = useState(1);
-  const [homeId, setHomeId] = useState();
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const {
-    data: allUserHomes,
+    allUserHomes,
     isLoading,
     isError,
-  } = useGetAllUserHomesQuery(userId);
-  console.log(allUserHomes);
-  useEffect(() => {
-    if (isLoading) {
-      console.log("Loading...");
-    }
+    error,
+    addHome,
+    updateHome,
+    deleteHome,
+  } = useHandleHomesApi({});
+  const [selectedHome, setSelectedHome] = useState(null);
 
-    if (isError) {
-      console.error("Error fetching data");
-    }
+  const handleAddHome = async (newHome) => {
+    await addHome(newHome);
+    setIsPopupOpen(false);
+    setSelectedHome(null);
+  };
 
-    if (allUserHomes) {
-      console.log(allUserHomes);
-    }
-  }, [isLoading, isError, allUserHomes]);
-  console.log(useId)
+  const handleUpdateHome = async (id, updatedHome) => {
+    await updateHome(id, updatedHome);
+    setIsPopupOpen(false);
+    setSelectedHome(null);
+  };
+
+  const handleDeleteHome = async (id) => {
+    await deleteHome(id);
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+
   return (
-    <>
+    <div className="home">
       <h1 className="title seperator">
         <span></span>
         Temperature Checker
-        <div className="btn" onClick={() => setPopup(true)}> 
+        <div className="btn" onClick={() => setIsPopupOpen(true)}>
           Add
           <i className="ri-add-fill"></i>
         </div>
       </h1>
       <div className="cards__container">
         {allUserHomes &&
-          allUserHomes.map((home) => ( 
+          allUserHomes.map((home) => (
             <HomeCard
-              setPopup={setPopup}
-              setHomeId={setHomeId}
-              key={home.homeId}
-              houseName={home.address || "Unnamed House"}
-              hid={home.homeId}
-              deviceName={home.deviceEui || "No Device"}
+              key={home.id}
+              home={home}
+              setSelectedHome={setSelectedHome}
+              onDelete={handleDeleteHome}
+              setPopup={setIsPopupOpen}
             />
           ))}
       </div>
-
-      <HomePopup popup={popup} homeId={homeId} userId={userId} setHomeId={setHomeId} setPopup={setPopup} />
-
-    </>
+      {error && <div>Error: {error}</div>}
+      {isPopupOpen && (
+        <HomePopup
+          setPopup={setIsPopupOpen}
+          selectedHome={selectedHome}
+          closePopup={() => {
+            setSelectedHome(null);
+            setIsPopupOpen(false);
+          }}
+          onAdd={handleAddHome}
+          onUpdate={handleUpdateHome}
+        />
+      )}
+    </div>
   );
-} 
+}
 
 export default Home;
