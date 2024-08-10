@@ -1,11 +1,8 @@
-import React, { useState } from "react";
-import { useRoomAddMutation, useRoomUpdateMutation } from "../../redux/services/DZapi";
-function RoomDetailPopup({ popup, setPopup,roomId, userId, setRoomId }) {
-  const [addRoom] = useRoomAddMutation();
-  const [updateRoom] = useRoomUpdateMutation();
+import React, { useState, useEffect } from "react";
+
+function RoomDetailPopup({ popup, setPopup, roomId, setRoomId, onSubmit, initialData }) {
   const [data, setData] = useState({
     isChecked: false,
-    roomId: "",
     roomName: "",
     idealTemp: "",
     minTemp: "",
@@ -15,70 +12,61 @@ function RoomDetailPopup({ popup, setPopup,roomId, userId, setRoomId }) {
     maxHum: "",
   });
 
+  useEffect(() => {
+    if (initialData) {
+      setData({
+        isChecked: initialData.isDefault,
+        roomName: initialData.roomName,
+        idealTemp: initialData.idealTemperature,
+        minTemp: initialData.limits.temperatureMin,
+        maxTemp: initialData.limits.temperatureMax,
+        idealHum: initialData.idealHumidity,
+        minHum: initialData.limits.humidityMin,
+        maxHum: initialData.limits.humidityMax,
+      });
+    }
+  }, [initialData]);
+
   const handleChange = (e) => {
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     setData({
       ...data,
-      [e.target.name]: e.target.value,
+      [e.target.name]: value,
     });
   };
 
   const closePopup = () => {
     setPopup(false);
     setRoomId(null);
-    console.log("sdfs")
   };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const updateData = {
-      roomProfileId: roomId,
+    const formData = {
       roomName: data.roomName,
-      idealTemperature: data.idealTemp,
+      idealTemperature: parseFloat(data.idealTemp),
       isDefault: data.isChecked,
-      idealHumidity: data.idealHum,
+      idealHumidity: parseFloat(data.idealHum),
       limits: {
-        "id": roomId,
-        humidityMin: data.minHum,
-        humidityMax: data.maxHum,
-        temperatureMin: data.minTemp,
-        temperatureMax: data.maxTemp,
+        humidityMin: parseFloat(data.minHum),
+        humidityMax: parseFloat(data.maxHum),
+        temperatureMin: parseFloat(data.minTemp),
+        temperatureMax: parseFloat(data.maxTemp),
       },
-    }
-    const addFormData = {
-      roomProfileId: roomId,
-      roomName: data.roomName,
-      idealTemperature: data.idealTemp,
-      isDefault: data.isChecked,
-      idealHumidity: data.idealHum,
-      limits: {
-        humidityMin: data.minHum,
-        humidityMax: data.maxHum,
-        temperatureMin: data.minTemp,
-        temperatureMax: data.maxTemp,
-      },
-    }
-    const addData = {
-      data: addFormData,
-      userId: userId,
-    }
-    if(roomId){
-      updateRoom(updateData)
-    }else{
-      addRoom(addData)
-    }
-    closePopup();
-    setRoomId(null);
-    console.log(roomId)
+    };
+    onSubmit(formData);
   };
+
   return (
     <>
       {popup && (
-        <form className="edit__popup">
+        <form className="edit__popup" onSubmit={handleSubmit}>
           <h1 className="small__title full__area">
-            {roomId ? "Edit": "Add"}
+            {roomId ? "Edit" : "Add"}
             <span>Room</span>
           </h1>
           <div className="form__container">
-            <div className="form">
+          <div className="form">
               <div className="input__field checkbox__field full__area">
                 <input
                   id="check"
@@ -164,12 +152,12 @@ function RoomDetailPopup({ popup, setPopup,roomId, userId, setRoomId }) {
             </div>
 
             <div className="seperator">
-              <div className="btn " onClick={(e) => handleSubmit(e)}>
+              <button type="submit" className="btn">
                 Submit
-              </div>
-              <div className="btn " onClick={closePopup}>
-                Cancle
-              </div>
+              </button>
+              <button type="button" className="btn" onClick={closePopup}>
+                Cancel
+              </button>
             </div>
           </div>
         </form>
