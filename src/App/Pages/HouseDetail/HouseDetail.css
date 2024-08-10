@@ -14,10 +14,9 @@
 
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 72px;
     align-items: center;
-    min-height: 85svh;
-
+    min-height: 100%;
     width: 450px;
 
     .header__container {
