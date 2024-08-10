@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import "./Login.css";
-import { useLoginMutation } from "../../redux/services/DZapi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import authService from "../../services/authService";
 
 function Login() {
-  const [login] = useLoginMutation();
+  const navigate = useNavigate();
   const [user, setUser] = useState({
     email: "",
     password: "",
   });
-  const [isError, setIsError] = useState(false); // Managing isError as a boolean
+  const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const onChangeHandle = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
@@ -17,13 +18,24 @@ function Login() {
 
   const onSubmitHandle = async (e) => {
     e.preventDefault();
+    setIsError(false);
+    setErrorMessage('');
+
     try {
-      const response = await login({ email: user.email, password: user.password }).unwrap();
-      localStorage.setItem("user", JSON.stringify(response?.data?.id));
-      console.log("Login successful", response.data);
+      // Use authService to handle login
+      const loggedInUser = await authService.login(user.email, user.password);
+
+      if (loggedInUser) {
+        // Store user details in localStorage and navigate to the home page
+        localStorage.setItem("user", JSON.stringify(loggedInUser));
+        navigate("/");
+      } else {
+        setIsError(true);
+        setErrorMessage('Invalid email or password.');
+      }
     } catch (error) {
-      console.error("Login error:", error);
       setIsError(true);
+      setErrorMessage('Error occurred during login. Please try again.');
     }
   };
   return (
@@ -35,17 +47,18 @@ function Login() {
             Don't have an account? <span>SignUp</span>
           </Link>
           {isError && (
-          <p className="error__message">Error occurred during login</p>
-        )}
+            <p className="error__message">{errorMessage}</p>
+          )}
         </div>
         <div className="input__field">
           <label htmlFor="email">Email</label>
           <input
             onChange={onChangeHandle}
-            type="text"
+            type="email"
             name="email"
             value={user.email}
             placeholder="Enter your email"
+            required
           />
         </div>
         <div className="input__field">
@@ -56,12 +69,12 @@ function Login() {
             name="password"
             value={user.password}
             placeholder="Enter your password"
+            required
           />
         </div>
         <button type="submit" className="btn">
           Login
         </button>
-        <span className="smalltext">Forgot your password?</span>
       </form>
       <div className="login__img">
         <img src="images/login.png" alt="Login" />
