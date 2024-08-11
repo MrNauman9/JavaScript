@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useSignupMutation } from '../../redux/services/DZapi';
+import { Link, useNavigate } from 'react-router-dom';
+import authService from '../../services/authService';
 
 function Signup() {
-  const [signup, { isError }] = useSignupMutation();
   const [user, setUser] = useState({
     email: '',
     password: '',
     userName: '',
   });
+
+  const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
 
   const onChangeHandle = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
@@ -16,12 +19,26 @@ function Signup() {
 
   const onSubmitHandle = async (e) => {
     e.preventDefault();
+    setIsError(false);
+    setErrorMessage('');
+
+    // Basic form validation
+    if (!user.userName || !user.email || !user.password) {
+      setIsError(true);
+      setErrorMessage('All fields are required.');
+      return;
+    }
+
     try {
-      const response = await signup(user).unwrap();
-      localStorage.setItem('user', JSON.stringify(response?.data?.id));
-      console.log('Signup successful', response.data);
+      // Make API request to register the user
+      await authService.register(user.userName, user.password, user.email);
+
+      // Redirect to login page on success
+      navigate('/login');
     } catch (error) {
-      console.error('Signup error:', error);
+      // Handle registration errors
+      setIsError(true);
+      setErrorMessage('Error occurred during signup. Please try again.');
     }
   };
 
@@ -33,7 +50,7 @@ function Signup() {
           <Link to="/login" className="small__text">
             Have an account? <span>Login</span>
           </Link>
-          {isError && <p className="error__message">Error occurred during signup</p>}
+          {isError && <p className="error__message">{errorMessage}</p>}
         </div>
         <div className="input__field">
           <label htmlFor="userName">UserName</label>
@@ -43,16 +60,18 @@ function Signup() {
             name="userName"
             value={user.userName}
             placeholder="Enter your UserName"
+            required
           />
         </div>
         <div className="input__field">
           <label htmlFor="email">Email</label>
           <input
             onChange={onChangeHandle}
-            type="text"
+            type="email"
             name="email"
             value={user.email}
             placeholder="Enter your email"
+            required
           />
         </div>
         <div className="input__field">
@@ -63,6 +82,7 @@ function Signup() {
             name="password"
             value={user.password}
             placeholder="Enter your password"
+            required
           />
         </div>
         <button type="submit" className="btn">
