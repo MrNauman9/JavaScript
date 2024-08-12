@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { Config } from "../constant/Index";
 
 export const useHandleRoomsApi = ({ initialAction = "GET", homeId }) => {
@@ -6,7 +6,7 @@ export const useHandleRoomsApi = ({ initialAction = "GET", homeId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [error, setError] = useState(null);
-
+  console.log(homeId, "homeID")
   const baseUrl = `${Config.serverUrl}rooms`;
 
   const handleApiCall = useCallback(async (url, method, body = null) => {
@@ -36,12 +36,11 @@ export const useHandleRoomsApi = ({ initialAction = "GET", homeId }) => {
     }
   }, []);
 
-  const getRooms = useCallback(async () => {
-    const url = homeId ? `${baseUrl}?home_id=${homeId}` : baseUrl;
-    console.log(url, "url")
-    const data = await handleApiCall(url, "GET");
+  const getAllRooms = useCallback(async () => {
+    console.log(`${baseUrl}`, "url");
+    const data = await handleApiCall(`${baseUrl}`, "GET");
     if (data) setAllRooms(data);
-  }, [handleApiCall, homeId]);
+  }, [handleApiCall, baseUrl]);
 
   const addRoom = useCallback(
     async (newRoom) => {
@@ -50,7 +49,7 @@ export const useHandleRoomsApi = ({ initialAction = "GET", homeId }) => {
       if (data) setAllRooms((prev) => [...prev, data]);
       return data;
     },
-    [handleApiCall, homeId]
+    [handleApiCall, homeId, baseUrl]
   );
 
   const updateRoom = useCallback(
@@ -63,7 +62,7 @@ export const useHandleRoomsApi = ({ initialAction = "GET", homeId }) => {
       }
       return data;
     },
-    [handleApiCall]
+    [handleApiCall, baseUrl]
   );
 
   const deleteRoom = useCallback(
@@ -74,21 +73,26 @@ export const useHandleRoomsApi = ({ initialAction = "GET", homeId }) => {
       }
       return data;
     },
-    [handleApiCall]
+    [handleApiCall, baseUrl]
   );
 
   useEffect(() => {
     if (initialAction === "GET") {
-      getRooms();
+      getAllRooms();
     }
-  }, [initialAction, getRooms]);
+  }, [initialAction, getAllRooms]);
+  const filteredRooms = useMemo(() => {
+    // if (!homeId) return allRooms;
+    return allRooms.filter(room => room.home_id == homeId);
+  }, [allRooms, homeId]);
 
   return {
     allRooms,
+    filteredRooms,
     isLoading,
     isError,
     error,
-    getRooms,
+    getAllRooms,
     addRoom,
     updateRoom,
     deleteRoom,

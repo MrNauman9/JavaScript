@@ -11,10 +11,8 @@ function Navbar() {
     }
   }, []);
 
-  const logout = () => {
-    localStorage.removeItem("user");
-    // Reload the page to refresh the application
-    window.location.reload();
+  const logout = async () => {
+    localStorage.clear();
     navigate("/login");
   };
 
